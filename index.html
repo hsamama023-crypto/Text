@@ -1,1 +1,673 @@
 
+<!DOCTYPE html>
+<html lang="ur" dir="ltr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Photo Text Editor</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Nastaliq+Urdu:wght@400;600;700&display=swap" rel="stylesheet" />
+  <style>
+    * { box-sizing: border-box; font-family: system-ui, -apple-system, sans-serif; }
+    body {
+      margin: 0;
+      padding: 18px;
+      background: #0f172a;
+      color: #f8fafc;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
+    }
+    h2 { margin: 0; font-size: 1.35rem; }
+    .panel {
+      background: #1e293b;
+      padding: 14px;
+      border-radius: 12px;
+      max-width: 960px;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      border: 1px solid #334155;
+    }
+    .row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+    .group-label {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: #94a3b8;
+      margin-right: 4px;
+      font-weight: 700;
+    }
+    input[type="text"], input[type="number"], select, button, label.btn {
+      padding: 8px 11px;
+      border-radius: 8px;
+      border: 1px solid #475569;
+      background: #0f172a;
+      color: #f8fafc;
+      font-size: 14px;
+    }
+    input[type="range"] {
+      accent-color: #38bdf8;
+      cursor: pointer;
+    }
+    input[type="color"] {
+      width: 38px;
+      height: 34px;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      padding: 0;
+    }
+    button, label.btn {
+      background: #2563eb;
+      border: none;
+      cursor: pointer;
+      font-weight: 600;
+      transition: background 0.15s ease;
+    }
+    button:hover, label.btn:hover { background: #1d4ed8; }
+    button.btn-new { background: #0d9488; }
+    button.btn-new:hover { background: #0f766e; }
+    button.active-tool {
+      background: #0284c7;
+      outline: 2px solid #7dd3fc;
+    }
+    button.danger { background: #dc2626; }
+    button.danger:hover { background: #b91c1c; }
+    button.download { background: #059669; }
+    button.download:hover { background: #047857; }
+    input[type="file"] { display: none; }
+    .check-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      color: #e2e8f0;
+      cursor: pointer;
+      user-select: none;
+    }
+    .canvas-wrap {
+      position: relative;
+      max-width: 960px;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      background: #1e293b;
+      padding: 12px;
+      border-radius: 12px;
+      border: 1px solid #334155;
+    }
+    canvas {
+      max-width: 100%;
+      height: auto;
+      border-radius: 8px;
+      touch-action: none;
+    }
+    #inlineEditor {
+      position: absolute;
+      display: none;
+      z-index: 20;
+      min-width: 160px;
+      padding: 6px 10px;
+      border-radius: 8px;
+      border: 2px solid #38bdf8;
+      background: rgba(15, 23, 42, 0.95);
+      color: #ffffff;
+      font-size: 16px;
+      outline: none;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+    }
+    .hint {
+      font-size: 12px;
+      color: #94a3b8;
+      max-width: 960px;
+      width: 100%;
+      line-height: 1.5;
+    }
+  </style>
+</head>
+<body>
+  <h2>Photo Text Editor</h2>
+
+  <div class="panel">
+    <div class="row">
+      <label class="btn" for="imgInput">1. Photo Upload</label>
+      <input type="file" id="imgInput" accept="image/*" />
+
+      <span class="group-label">Mode:</span>
+      <button id="modeMoveBtn" class="active-tool">Text Move / Tap Edit</button>
+      <button id="modePatchColorBtn">Purana Text Mitayein (Color)</button>
+      <button id="modePatchBlurBtn">Purana Text Mitayein (Blur)</button>
+      <button id="modeEraserBtn">Patch Eraser</button>
+
+      <button id="downloadBtn" class="download" style="margin-left:auto;">Download PNG</button>
+    </div>
+
+    <div class="row">
+      <span class="group-label">Text:</span>
+      <input type="text" id="textInput" placeholder="Text ya Urdu likhein..." style="min-width: 210px;" />
+      <button id="newTextBtn" class="btn-new">+ New Text</button>
+      <input type="number" id="sizeInput" value="36" min="12" max="220" style="width: 74px;" title="Font Size" />
+      <input type="color" id="colorInput" value="#ffffff" title="Text Color" />
+      <select id="fontInput">
+        <option value="'Noto Nastaliq Urdu', serif">Urdu (Noto Nastaliq)</option>
+        <option value="sans-serif">Sans Serif</option>
+        <option value="serif">Serif</option>
+        <option value="monospace">Monospace</option>
+        <option value="Arial, sans-serif">Arial</option>
+      </select>
+      <label class="check-label"><input type="checkbox" id="outlineCheck" /> Outline</label>
+      <button id="deleteTextBtn" class="danger">Delete Text</button>
+    </div>
+
+    <div class="row">
+      <span class="group-label">Saya (Shadow):</span>
+      <label class="check-label"><input type="checkbox" id="shadowCheck" checked /> Saya On</label>
+      <input type="color" id="shadowColorInput" value="#000000" title="Shadow Color" />
+      <label class="check-label">Blur <input type="range" id="shadowBlurInput" min="0" max="40" value="10" /></label>
+      <label class="check-label">X <input type="range" id="shadowXInput" min="-30" max="30" value="3" style="width:75px;" /></label>
+      <label class="check-label">Y <input type="range" id="shadowYInput" min="-30" max="30" value="4" style="width:75px;" /></label>
+    </div>
+    <div class="row">
+      <span class="group-label">Purana Text Brush:</span>
+      <label class="check-label">Size <input type="range" id="brushSizeInput" min="6" max="100" value="26" /></label>
+      <span id="brushSizeVal" style="font-size:12px; color:#cbd5e1;">26px</span>
+      <label class="check-label">Patch Color <input type="color" id="patchColorInput" value="#ffffff" /></label>
+      <button id="eyedropBtn">Color Picker (Click Photo)</button>
+      <button id="clearPatchBtn" class="danger">Clear Patches</button>
+    </div>
+  </div>
+
+  <div class="canvas-wrap" id="canvasWrap">
+    <canvas id="editorCanvas" width="840" height="520"></canvas>
+    <input type="text" id="inlineEditor" placeholder="Yahan likhein..." autocomplete="off" />
+  </div>
+
+  <div class="hint">
+    <strong>Aasaan Tareeqa:</strong> Kisi bhi text par <strong>tap/click</strong> karein to keyboard khul jayega aur box wahin aa jayega. Drag kar ke text move bhi kar sakte hain.
+  </div>
+
+  <script>
+    const canvas = document.getElementById("editorCanvas");
+    const ctx = canvas.getContext("2d");
+    const canvasWrap = document.getElementById("canvasWrap");
+    const inlineEditor = document.getElementById("inlineEditor");
+
+    const patchCanvas = document.createElement("canvas");
+    patchCanvas.width = canvas.width;
+    patchCanvas.height = canvas.height;
+    const pCtx = patchCanvas.getContext("2d");
+
+    const imgInput = document.getElementById("imgInput");
+
+    const modeMoveBtn = document.getElementById("modeMoveBtn");
+    const modePatchColorBtn = document.getElementById("modePatchColorBtn");
+    const modePatchBlurBtn = document.getElementById("modePatchBlurBtn");
+    const modeEraserBtn = document.getElementById("modeEraserBtn");
+    const clearPatchBtn = document.getElementById("clearPatchBtn");
+    const eyedropBtn = document.getElementById("eyedropBtn");
+
+    const brushSizeInput = document.getElementById("brushSizeInput");
+    const brushSizeVal = document.getElementById("brushSizeVal");
+    const patchColorInput = document.getElementById("patchColorInput");
+
+    const textInput = document.getElementById("textInput");
+    const newTextBtn = document.getElementById("newTextBtn");
+    const sizeInput = document.getElementById("sizeInput");
+    const colorInput = document.getElementById("colorInput");
+    const fontInput = document.getElementById("fontInput");
+    const outlineCheck = document.getElementById("outlineCheck");
+    const deleteTextBtn = document.getElementById("deleteTextBtn");
+
+    const shadowCheck = document.getElementById("shadowCheck");
+    const shadowColorInput = document.getElementById("shadowColorInput");
+    const shadowBlurInput = document.getElementById("shadowBlurInput");
+    const shadowXInput = document.getElementById("shadowXInput");
+    const shadowYInput = document.getElementById("shadowYInput");
+
+    const downloadBtn = document.getElementById("downloadBtn");
+
+    let currentMode = "move";
+    let pickingColor = false;
+    let bgImage = null;
+
+    let texts = [];
+    let selectedTextIndex = -1;
+    let isPointerDown = false;
+    let didDrag = false;
+    let startX = 0;
+    let startY = 0;
+    let offsetX = 0;
+    let offsetY = 0;
+    function hideInlineEditor(commitValue = true) {
+      if (inlineEditor.style.display === "none") return;
+      if (commitValue && selectedTextIndex >= 0 && texts[selectedTextIndex]) {
+        texts[selectedTextIndex].text = inlineEditor.value;
+        textInput.value = inlineEditor.value;
+      }
+      inlineEditor.style.display = "none";
+      render();
+    }
+
+    function openInlineEditorForText(index) {
+      const item = texts[index];
+      if (!item) return;
+
+      const rect = canvas.getBoundingClientRect();
+      const wrapRect = canvasWrap.getBoundingClientRect();
+      const scaleX = rect.width / canvas.width;
+      const scaleY = rect.height / canvas.height;
+
+      const leftPx = (rect.left - wrapRect.left) + item.x * scaleX;
+      const topPx = (rect.top - wrapRect.top) + item.y * scaleY;
+
+      inlineEditor.value = item.text;
+      inlineEditor.style.fontFamily = item.fontFamily;
+      inlineEditor.style.left = Math.max(10, Math.min(leftPx, wrapRect.width - 190)) + "px";
+      inlineEditor.style.top = Math.max(10, Math.min(topPx, wrapRect.height - 54)) + "px";
+      inlineEditor.style.display = "block";
+
+      setTimeout(() => {
+        inlineEditor.focus();
+        inlineEditor.select();
+      }, 20);
+    }
+
+    inlineEditor.addEventListener("input", () => {
+      if (selectedTextIndex >= 0 && texts[selectedTextIndex]) {
+        texts[selectedTextIndex].text = inlineEditor.value;
+        textInput.value = inlineEditor.value;
+        render();
+      }
+    });
+
+    inlineEditor.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        hideInlineEditor(true);
+      } else if (e.key === "Escape") {
+        hideInlineEditor(false);
+      }
+    });
+
+    inlineEditor.addEventListener("blur", () => {
+      hideInlineEditor(true);
+    });
+
+    function loadSelectedTextIntoInputs() {
+      if (selectedTextIndex >= 0 && texts[selectedTextIndex]) {
+        const t = texts[selectedTextIndex];
+        textInput.value = t.text;
+        sizeInput.value = t.fontSize;
+        colorInput.value = t.color;
+        fontInput.value = t.fontFamily;
+        outlineCheck.checked = Boolean(t.outline);
+        shadowCheck.checked = Boolean(t.shadow);
+        shadowColorInput.value = t.shadowColor || "#000000";
+        shadowBlurInput.value = t.shadowBlur ?? 10;
+        shadowXInput.value = t.shadowX ?? 3;
+        shadowYInput.value = t.shadowY ?? 4;
+      } else {
+        textInput.value = "";
+      }
+    }
+
+    newTextBtn.addEventListener("click", () => {
+      setMode("move");
+      const newLayer = {
+        text: "Naya Text",
+        x: 50,
+        y: Math.max(50, Math.round(canvas.height / 2)),
+        fontSize: parseInt(sizeInput.value, 10) || 36,
+        color: colorInput.value,
+        fontFamily: fontInput.value,
+        outline: outlineCheck.checked,
+        shadow: shadowCheck.checked,
+        shadowColor: shadowColorInput.value,
+        shadowBlur: parseInt(shadowBlurInput.value, 10) || 0,
+        shadowX: parseInt(shadowXInput.value, 10) || 0,
+        shadowY: parseInt(shadowYInput.value, 10) || 0
+      };
+      texts.push(newLayer);
+      selectedTextIndex = texts.length - 1;
+      loadSelectedTextIntoInputs();
+      render();
+      openInlineEditorForText(selectedTextIndex);
+    });
+
+    textInput.addEventListener("input", () => {
+      if (selectedTextIndex < 0 || !texts[selectedTextIndex]) {
+        const newLayer = {
+          text: textInput.value,
+          x: 50,
+          y: Math.max(50, Math.round(canvas.height / 2)),
+          fontSize: parseInt(sizeInput.value, 10) || 36,
+          color: colorInput.value,
+          fontFamily: fontInput.value,
+          outline: outlineCheck.checked,
+          shadow: shadowCheck.checked,
+          shadowColor: shadowColorInput.value,
+          shadowBlur: parseInt(shadowBlurInput.value, 10) || 0,
+          shadowX: parseInt(shadowXInput.value, 10) || 0,
+          shadowY: parseInt(shadowYInput.value, 10) || 0
+        };
+        texts.push(newLayer);
+        selectedTextIndex = texts.length - 1;
+      } else {
+        texts[selectedTextIndex].text = textInput.value;
+      }
+      render();
+    });
+
+    function applyStyleChanges() {
+      if (selectedTextIndex < 0 || !texts[selectedTextIndex]) return;
+      const t = texts[selectedTextIndex];
+      t.fontSize = parseInt(sizeInput.value, 10) || 36;
+      t.color = colorInput.value;
+      t.fontFamily = fontInput.value;
+      t.outline = outlineCheck.checked;
+      t.shadow = shadowCheck.checked;
+      t.shadowColor = shadowColorInput.value;
+      t.shadowBlur = parseInt(shadowBlurInput.value, 10) || 0;
+      t.shadowX = parseInt(shadowXInput.value, 10) || 0;
+      t.shadowY = parseInt(shadowYInput.value, 10) || 0;
+      render();
+    }
+
+    [sizeInput, colorInput, fontInput, outlineCheck, shadowCheck, shadowColorInput, shadowBlurInput, shadowXInput, shadowYInput].forEach(el => {
+      el.addEventListener("input", applyStyleChanges);
+      el.addEventListener("change", applyStyleChanges);
+    });
+
+    deleteTextBtn.addEventListener("click", () => {
+      hideInlineEditor(false);
+      if (selectedTextIndex >= 0 && texts[selectedTextIndex]) {
+        texts.splice(selectedTextIndex, 1);
+        selectedTextIndex = texts.length - 1;
+        loadSelectedTextIntoInputs();
+        render();
+      }
+    });
+
+    brushSizeInput.addEventListener("input", () => {
+      brushSizeVal.textContent = brushSizeInput.value + "px";
+    });
+
+    function setMode(mode) {
+      hideInlineEditor(true);
+      currentMode = mode;
+      pickingColor = false;
+      eyedropBtn.classList.remove("active-tool");
+      [modeMoveBtn, modePatchColorBtn, modePatchBlurBtn, modeEraserBtn].forEach(b => b.classList.remove("active-tool"));
+      if (mode === "move") modeMoveBtn.classList.add("active-tool");
+      if (mode === "patchColor") modePatchColorBtn.classList.add("active-tool");
+      if (mode === "patchBlur") modePatchBlurBtn.classList.add("active-tool");
+      if (mode === "eraser") modeEraserBtn.classList.add("active-tool");
+      canvas.style.cursor = mode === "move" ? "grab" : "crosshair";
+      render();
+    }
+
+    modeMoveBtn.addEventListener("click", () => setMode("move"));
+    modePatchColorBtn.addEventListener("click", () => setMode("patchColor"));
+    modePatchBlurBtn.addEventListener("click", () => setMode("patchBlur"));
+    modeEraserBtn.addEventListener("click", () => setMode("eraser"));
+
+    eyedropBtn.addEventListener("click", () => {
+      setMode("patchColor");
+      pickingColor = true;
+      eyedropBtn.classList.add("active-tool");
+      canvas.style.cursor = "copy";
+    });
+
+    clearPatchBtn.addEventListener("click", () => {
+      pCtx.clearRect(0, 0, patchCanvas.width, patchCanvas.height);
+      render();
+    });
+
+    function drawPlaceholder() {
+      ctx.fillStyle = "#334155";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = "#e2e8f0";
+      ctx.font = "20px sans-serif";
+      ctx.textAlign = "center";
+      ctx.fillText("Pehle ek photo upload karein", canvas.width / 2, canvas.height / 2);
+      ctx.textAlign = "start";
+    }
+
+    function render(isExporting = false) {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      if (bgImage) {
+        ctx.drawImage(bgImage, 0, 0, canvas.width, canvas.height);
+      } else {
+        drawPlaceholder();
+      }
+
+      ctx.drawImage(patchCanvas, 0, 0);
+
+      texts.forEach((item, idx) => {
+        ctx.save();
+        ctx.font = `${item.fontSize}px ${item.fontFamily}`;
+        ctx.textBaseline = "top";
+
+        if (item.shadow) {
+          ctx.shadowColor = item.shadowColor;
+          ctx.shadowBlur = item.shadowBlur;
+          ctx.shadowOffsetX = item.shadowX;
+          ctx.shadowOffsetY = item.shadowY;
+        }
+
+        if (item.outline) {
+          ctx.lineWidth = Math.max(2, Math.round(item.fontSize / 12));
+          ctx.strokeStyle = "#0f172a";
+          ctx.strokeText(item.text, item.x, item.y);
+        }
+
+        ctx.fillStyle = item.color;
+        ctx.fillText(item.text, item.x, item.y);
+        ctx.restore();
+
+        if (!isExporting && idx === selectedTextIndex && currentMode === "move") {
+          ctx.save();
+          ctx.font = `${item.fontSize}px ${item.fontFamily}`;
+          const w = Math.max(40, ctx.measureText(item.text).width);
+          const h = item.fontSize * 1.25;
+          ctx.strokeStyle = "#38bdf8";
+          ctx.lineWidth = 2;
+          ctx.strokeRect(item.x - 4, item.y - 2, w + 8, h + 4);
+          ctx.restore();
+        }
+      });
+        }
+    imgInput.addEventListener("change", (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        const img = new Image();
+        img.onload = () => {
+          bgImage = img;
+          const maxW = 1200;
+          const scale = img.width > maxW ? maxW / img.width : 1;
+          canvas.width = Math.round(img.width * scale);
+          canvas.height = Math.round(img.height * scale);
+
+          patchCanvas.width = canvas.width;
+          patchCanvas.height = canvas.height;
+          pCtx.clearRect(0, 0, patchCanvas.width, patchCanvas.height);
+
+          render();
+        };
+        img.src = reader.result;
+      };
+      reader.readAsDataURL(file);
+    });
+
+    function getCanvasCoords(clientX, clientY) {
+      const rect = canvas.getBoundingClientRect();
+      const scaleX = canvas.width / rect.width;
+      const scaleY = canvas.height / rect.height;
+      return {
+        x: (clientX - rect.left) * scaleX,
+        y: (clientY - rect.top) * scaleY
+      };
+    }
+
+    function rgbToHex(r, g, b) {
+      return "#" + [r, g, b].map(v => v.toString(16).padStart(2, "0")).join("");
+    }
+
+    function applyPatchAt(x, y) {
+      const radius = parseInt(brushSizeInput.value, 10) / 2;
+      if (currentMode === "patchColor") {
+        pCtx.save();
+        pCtx.globalCompositeOperation = "source-over";
+        pCtx.fillStyle = patchColorInput.value;
+        pCtx.beginPath();
+        pCtx.arc(x, y, radius, 0, Math.PI * 2);
+        pCtx.fill();
+        pCtx.restore();
+      } else if (currentMode === "patchBlur") {
+        const size = radius * 2;
+        const sx = Math.max(0, x - radius);
+        const sy = Math.max(0, y - radius);
+        pCtx.save();
+        pCtx.beginPath();
+        pCtx.arc(x, y, radius, 0, Math.PI * 2);
+        pCtx.clip();
+        pCtx.filter = "blur(8px)";
+        pCtx.drawImage(canvas, sx, sy, size, size, sx, sy, size, size);
+        pCtx.restore();
+      } else if (currentMode === "eraser") {
+        pCtx.save();
+        pCtx.globalCompositeOperation = "destination-out";
+        pCtx.beginPath();
+        pCtx.arc(x, y, radius, 0, Math.PI * 2);
+        pCtx.fill();
+        pCtx.restore();
+      }
+      render();
+    }
+
+    function onPointerDown(clientX, clientY) {
+      hideInlineEditor(true);
+      const pos = getCanvasCoords(clientX, clientY);
+      isPointerDown = true;
+      didDrag = false;
+      startX = pos.x;
+      startY = pos.y;
+
+      if (pickingColor) {
+        const px = Math.min(canvas.width - 1, Math.max(0, Math.floor(pos.x)));
+        const py = Math.min(canvas.height - 1, Math.max(0, Math.floor(pos.y)));
+        const data = ctx.getImageData(px, py, 1, 1).data;
+        patchColorInput.value = rgbToHex(data[0], data[1], data[2]);
+        pickingColor = false;
+        eyedropBtn.classList.remove("active-tool");
+        canvas.style.cursor = "crosshair";
+        isPointerDown = false;
+        return;
+      }
+
+      if (currentMode !== "move") {
+        applyPatchAt(pos.x, pos.y);
+        return;
+      }
+
+      let hitTextIdx = -1;
+      for (let i = texts.length - 1; i >= 0; i--) {
+        const t = texts[i];
+        ctx.font = `${t.fontSize}px ${t.fontFamily}`;
+        const w = Math.max(50, ctx.measureText(t.text).width);
+        const h = Math.max(36, t.fontSize * 1.25);
+        if (pos.x >= t.x - 8 && pos.x <= t.x + w + 8 && pos.y >= t.y - 6 && pos.y <= t.y + h + 6) {
+          hitTextIdx = i;
+          break;
+        }
+      }
+
+      if (hitTextIdx >= 0) {
+        selectedTextIndex = hitTextIdx;
+        offsetX = pos.x - texts[hitTextIdx].x;
+        offsetY = pos.y - texts[hitTextIdx].y;
+        loadSelectedTextIntoInputs();
+        render();
+        return;
+      }
+
+      selectedTextIndex = -1;
+      loadSelectedTextIntoInputs();
+      render();
+    }
+
+    function onPointerMove(clientX, clientY) {
+      if (!isPointerDown) return;
+      const pos = getCanvasCoords(clientX, clientY);
+
+      if (currentMode !== "move") {
+        applyPatchAt(pos.x, pos.y);
+        return;
+      }
+
+      if (selectedTextIndex >= 0 && texts[selectedTextIndex]) {
+        const dist = Math.hypot(pos.x - startX, pos.y - startY);
+        if (dist > 6) {
+          didDrag = true;
+        }
+        texts[selectedTextIndex].x = pos.x - offsetX;
+        texts[selectedTextIndex].y = pos.y - offsetY;
+        render();
+      }
+    }
+
+    function onPointerUp() {
+      const wasTapOnText = isPointerDown && !didDrag && currentMode === "move" && selectedTextIndex >= 0;
+      isPointerDown = false;
+
+      if (wasTapOnText) {
+        openInlineEditorForText(selectedTextIndex);
+      }
+      didDrag = false;
+    }
+
+    canvas.addEventListener("mousedown", (e) => onPointerDown(e.clientX, e.clientY));
+    window.addEventListener("mousemove", (e) => onPointerMove(e.clientX, e.clientY));
+    window.addEventListener("mouseup", onPointerUp);
+
+    canvas.addEventListener("touchstart", (e) => {
+      if (e.touches.length > 0) {
+        onPointerDown(e.touches[0].clientX, e.touches[0].clientY);
+      }
+    }, { passive: true });
+
+    canvas.addEventListener("touchmove", (e) => {
+      if (e.touches.length > 0 && isPointerDown) {
+        e.preventDefault();
+        onPointerMove(e.touches[0].clientX, e.touches[0].clientY);
+      }
+    }, { passive: false });
+
+    window.addEventListener("touchend", onPointerUp);
+
+    downloadBtn.addEventListener("click", () => {
+      hideInlineEditor(true);
+      render(true);
+      const link = document.createElement("a");
+      link.download = "edited-photo.png";
+      link.href = canvas.toDataURL("image/png");
+      link.click();
+      render(false);
+    });
+
+    drawPlaceholder();
+  </script>
+</body>
+</html>
