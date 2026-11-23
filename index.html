@@ -5,31 +5,28 @@
 <title>TextFix AI - Kisi bhi image ka text 10 second me badlo</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
-<style>body{font-family:'Inter',sans-serif} .orange{background:#FF6B00} input,select{outline:none} #drop{border:2px dashed #FF6B00}</style>
+<style>body{font-family:'Inter',sans-serif} input,select{outline:none} #drop{border:2px dashed #FF6B00}</style>
 </head>
 <body class="bg-white text-black">
 
-<!-- NAVBAR -->
 <nav class="flex justify-between items-center px-4 md:px-10 py-4 shadow sticky top-0 bg-white z-50">
 <div class="font-extrabold text-xl">🟧 TextFix <span class="text-[#FF6B00]">AI</span></div>
 <div class="hidden md:flex gap-6 text-sm font-medium"><a href="#editor">Editor</a><a href="#features">Features</a><a href="#pricing">Pricing</a><a href="#faq">FAQ</a></div>
-<div class="flex items-center gap-2"><span class="bg-orange-100 text-[#FF6B00] px-3 py-1 rounded-full text-xs font-bold">Credits: <span id="creditCount">1</span></span><button class="bg-black text-white px-4 py-2 rounded-full text-sm">Login</button></div>
+<div class="flex items-center gap-2"><span class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-bold">● FREE MODE</span><button class="bg-black text-white px-4 py-2 rounded-full text-sm">Login</button></div>
 </nav>
 
-<!-- HERO -->
 <header class="text-center px-4 py-10 md:py-16 bg-gradient-to-b from-orange-50 to-white">
-<span class="bg-[#FF6B00] text-white text-xs px-3 py-1 rounded-full font-bold">🔥 1 FREE EDIT</span>
+<span class="bg-[#FF6B00] text-white text-xs px-3 py-1 rounded-full font-bold">🔥 100% FREE - NO CREDIT</span>
 <h1 class="text-3xl md:text-5xl font-extrabold mt-4 leading-tight">Kisi bhi image ka text<br><span class="text-[#FF6B00]">10 second me badlo</span></h1>
 <p class="text-gray-600 mt-3">Poster, Thumbnail, Banner, Shop Board - font, color, background same rahega.</p>
 <a href="#editor" class="inline-block mt-6 bg-[#FF6B00] text-white px-8 py-3 rounded-full font-bold shadow-lg">📸 Image Upload Karo - FREE</a>
 </header>
 
-<!-- EDITOR -->
 <section id="editor" class="max-w-3xl mx-auto px-4 pb-10">
 <div class="bg-gray-50 p-4 rounded-2xl shadow">
-<label class="text-sm font-bold">🔑 Apni Gemini API Key:</label>
-<input id="apiKey" type="password" placeholder="AIza... paste karo" class="w-full mt-1 p-3 rounded-xl border bg-white" oninput="localStorage.setItem('tf_key',this.value)">
-<p class="text-[11px] text-gray-500 mt-1">Key sirf tumhare browser me rehti hai, GitHub pe save nahi hoti.</p>
+<label class="text-sm font-bold">🔑 Apni FREE OpenRouter Key:</label>
+<input id="apiKey" type="password" placeholder="sk-or-v1-... paste karo" class="w-full mt-1 p-3 rounded-xl border bg-white" oninput="localStorage.setItem('tf_key',this.value)">
+<p class="text-[11px] text-gray-500 mt-1">Key sirf tumhare browser me rehti hai. <b>OpenRouter.ai > Keys > Create Key</b> se free me lo.</p>
 </div>
 
 <div id="drop" class="mt-4 p-6 rounded-2xl text-center bg-white cursor-pointer" onclick="document.getElementById('file').click()">
@@ -56,18 +53,15 @@
 <div class="flex gap-2 mt-3"><a id="dl" download="textfix-ai.png" class="flex-1 text-center bg-black text-white py-3 rounded-xl font-bold">⬇️ HD Download</a><button onclick="location.reload()" class="flex-1 bg-gray-200 py-3 rounded-xl font-bold">New Edit</button></div>
 </div>
 </div>
-
 <div class="mt-4"><p class="font-bold text-sm">Recent Edits:</p><div id="history" class="flex gap-2 overflow-x-auto mt-2"></div></div>
 </section>
 
-<!-- HOW -->
 <section class="max-w-4xl mx-auto px-4 py-8 grid md:grid-cols-3 gap-4 text-center">
 <div class="p-5 bg-orange-50 rounded-2xl"><div class="text-3xl">📤</div><h3 class="font-bold mt-2">1. Upload</h3><p class="text-sm text-gray-600">Image upload karo</p></div>
 <div class="p-5 bg-orange-50 rounded-2xl"><div class="text-3xl">✍️</div><h3 class="font-bold mt-2">2. Text Likho</h3><p class="text-sm text-gray-600">Purana aur naya text likho</p></div>
 <div class="p-5 bg-orange-50 rounded-2xl"><div class="text-3xl">⬇️</div><h3 class="font-bold mt-2">3. Download</h3><p class="text-sm text-gray-600">HD me download karo</p></div>
 </section>
 
-<!-- FEATURES -->
 <section id="features" class="max-w-4xl mx-auto px-4 py-6">
 <h2 class="text-2xl font-extrabold text-center">Features</h2>
 <div class="grid grid-cols-2 md:grid-cols-3 gap-3 mt-4">
@@ -80,30 +74,26 @@
 </div>
 </section>
 
-<!-- PRICING -->
 <section id="pricing" class="max-w-4xl mx-auto px-4 py-8">
 <h2 class="text-2xl font-extrabold text-center">Pricing</h2>
 <div class="grid md:grid-cols-3 gap-4 mt-5">
-<div class="p-5 border rounded-2xl text-center"><h3 class="font-bold">Free</h3><p class="text-3xl font-extrabold mt-2">$0</p><p class="text-sm">1 Credit</p><button class="w-full mt-3 bg-gray-200 py-2 rounded-xl font-bold">Start Free</button></div>
-<div class="p-5 border-2 border-[#FF6B00] rounded-2xl text-center bg-orange-50"><h3 class="font-bold">30 Credits ⭐ Popular</h3><p class="text-3xl font-extrabold mt-2">$9.90</p><p class="text-sm">HD Download</p><button onclick="alert('JazzCash / Easypaisa se contact karo')" class="w-full mt-3 bg-[#FF6B00] text-white py-2 rounded-xl font-bold">Buy Now</button></div>
+<div class="p-5 border-2 border-green-500 rounded-2xl text-center bg-green-50"><h3 class="font-bold">Free ⭐</h3><p class="text-3xl font-extrabold mt-2">$0</p><p class="text-sm">Unlimited with your Free Key</p><button class="w-full mt-3 bg-green-600 text-white py-2 rounded-xl font-bold">Start Free</button></div>
+<div class="p-5 border rounded-2xl text-center"><h3 class="font-bold">30 Credits</h3><p class="text-3xl font-extrabold mt-2">$9.90</p><p class="text-sm">HD Download</p><button onclick="alert('JazzCash / Easypaisa se contact karo')" class="w-full mt-3 bg-[#FF6B00] text-white py-2 rounded-xl font-bold">Buy Now</button></div>
 <div class="p-5 border rounded-2xl text-center"><h3 class="font-bold">100 Credits</h3><p class="text-3xl font-extrabold mt-2">$24.90</p><p class="text-sm">Best for Shops</p><button onclick="alert('JazzCash / Easypaisa se contact karo')" class="w-full mt-3 bg-black text-white py-2 rounded-xl font-bold">Buy Now</button></div>
 </div>
 </section>
 
-<!-- FAQ -->
 <section id="faq" class="max-w-3xl mx-auto px-4 pb-10">
 <h2 class="text-2xl font-extrabold text-center">FAQ</h2>
-<details class="border p-3 rounded-xl mt-3"><summary class="font-bold cursor-pointer">Kya ye free hai?</summary><p class="text-sm mt-2">Pehla edit free hai, uske baad apni API key se unlimited.</p></details>
+<details class="border p-3 rounded-xl mt-3"><summary class="font-bold cursor-pointer">Kya ye free hai?</summary><p class="text-sm mt-2">Haan, OpenRouter ki free key se unlimited.</p></details>
 <details class="border p-3 rounded-xl mt-2"><summary class="font-bold cursor-pointer">ID Card ka text badal sakte hain?</summary><p class="text-sm mt-2">Nahi, ID, Passport, Bank documents block hain. Sirf poster / banner / shop board ke liye hai.</p></details>
 <details class="border p-3 rounded-xl mt-2"><summary class="font-bold cursor-pointer">Meri API key safe hai?</summary><p class="text-sm mt-2">Haan, key sirf tumhare browser me rehti hai.</p></details>
-<details class="border p-3 rounded-xl mt-2"><summary class="font-bold cursor-pointer">Quality kaisi hogi?</summary><p class="text-sm mt-2">Font aur background same rehta hai, HD download milta hai.</p></details>
-<details class="border p-3 rounded-xl mt-2"><summary class="font-bold cursor-pointer">Payment kaise karen?</summary><p class="text-sm mt-2">JazzCash / Easypaisa se contact karo.</p></details>
 </section>
 
 <footer class="bg-black text-white text-center py-6 text-sm">© 2026 TextFix AI - Made in Pakistan 🇵🇰 | Privacy | Terms | Contact</footer>
 
 <script>
-let base64="", credits=1;
+let base64="";
 document.getElementById('apiKey').value=localStorage.getItem('tf_key')||'';
 document.getElementById('file').addEventListener('change',e=>{
 let f=e.target.files[0]; if(!f) return;
@@ -113,21 +103,25 @@ async function generate(){
 let key=document.getElementById('apiKey').value.trim();
 let oldT=document.getElementById('oldText').value.trim();
 let newT=document.getElementById('newText').value.trim();
-if(!key){alert('Pehle API Key dalo');return;}
+if(!key){alert('Pehle OpenRouter FREE Key dalo - openrouter.ai se lo');return;}
 if(!base64){alert('Pehle image upload karo');return;}
 if(!oldT||!newT){alert('Dono text likho');return;}
-if(credits<=0){alert('Credits khatam! Buy Credits karo');return;}
 let btn=document.getElementById('genBtn'); btn.innerText='⏳ AI Editing... Please wait...'; btn.disabled=true;
-document.getElementById('status').innerText='AI is editing your image...';
+document.getElementById('status').innerText='AI is editing your image... FREE mode...';
 try{
-let res=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image:generateContent?key=${key}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contents:[{parts:[{text:`Replace only the text '${oldT}' with '${newT}' in this image. Language: ${document.getElementById('lang').value}. Keep font, color, size, shadow, perspective, background and everything else exactly same. Do not change anything else. Do not process ID cards, passports, bank documents.`},{inline_data:{mime_type:'image/jpeg',data:base64}}]}]})});
+let res=await fetch(`https://openrouter.ai/api/v1/chat/completions`,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+key,'HTTP-Referer':location.href,'X-Title':'TextFix AI'},body:JSON.stringify({model:"google/gemini-2.5-flash-image-preview:free",messages:[{role:"user",content:[{type:"text",text:`Replace only the text '${oldT}' with '${newT}' in this image. Language: ${document.getElementById('lang').value}. Keep font, color, size, shadow, perspective, background and everything else exactly same. Do not change anything else. Do not process ID cards, passports, bank documents.`},{type:"image_url",image_url:{url:"data:image/jpeg;base64,"+base64}}]}]})});
 let data=await res.json();
-let part=data.candidates?.[0]?.content?.parts?.find(p=>p.inlineData);
-if(!part){throw new Error(data.error?.message||'AI ne image nahi banai. Dobara try karo.')}
-let img='data:image/png;base64,'+part.inlineData.data;
+console.log(data);
+let img = data.choices?.[0]?.message?.images?.[0]?.image_url?.url;
+if(!img){
+  // kuch models text me base64 dete hain
+  let content = data.choices?.[0]?.message?.content || "";
+  let match = content.match(/data:image\/[^;]+;base64,[A-Za-z0-9+/=]+/);
+  if(match) img = match[0];
+}
+if(!img){throw new Error(data.error?.message || 'AI ne image nahi banai. Thodi der baad dobara try karo - Free model busy hota hai.')}
 document.getElementById('resultImg').src=img; document.getElementById('dl').href=img;
 document.getElementById('resultBox').classList.remove('hidden');
-credits--; document.getElementById('creditCount').innerText=credits;
 document.getElementById('status').innerText='✅ Ho gaya! Download karo.';
 let h=document.createElement('img'); h.src=img; h.className='w-20 h-20 object-cover rounded-xl'; document.getElementById('history').appendChild(h);
 }catch(e){document.getElementById('status').innerText='❌ Error: '+e.message;}
@@ -135,4 +129,4 @@ btn.innerText='✨ GENERATE - Text Badlo'; btn.disabled=false;
 }
 </script>
 </body>
-</html>
+  </html>
