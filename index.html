@@ -1,392 +1,138 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Document Sheet Preview</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
-  <style>
-    :root {
-      --bg-viewport: #eef1ef;
-      --bg-sheet: #ffffff;
-      --line-soft: #e2e6e4;
-      --line-faint: #edf0ee;
-      --green-deep: #1b6b3e;
-      --green-mid: #288550;
-      --green-bright: #2e985b;
-      --green-soft: #4ca973;
-      --dot-gray: rgba(164, 173, 169, 0.36);
-      --dot-sage: rgba(66, 162, 108, 0.25);
-    }
-    html { scroll-padding-top: env(safe-area-inset-top, 0px); }
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html, body {
-      min-height: 100%;
-      width: 100%;
-      background-color: var(--bg-viewport);
-      font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      overflow-x: hidden;
-    }
-    .page-wrapper {
-      min-height: 100vh;
-      width: 100%;
-      display: flex;
-      justify-content: center;
-      align-items: flex-start;
-      padding: 16px 12px;
-    }
-    .sheet {
-      position: relative;
-      width: 100%;
-      max-width: 720px;
-      min-height: 980px;
-      height: auto;
-      background-color: var(--bg-sheet);
-      box-shadow: 0 12px 32px rgba(15, 23, 18, 0.06);
-      display: flex;
-      flex-direction: column;
-      overflow: visible;
-      border-radius: 2px;
-    }
-    .side-dot-band {
-      position: absolute;
-      top: 0;
-      bottom: 18px;
-      width: 68px;
-      pointer-events: none;
-      z-index: 1;
-      background-image:
-        radial-gradient(var(--dot-gray) 1.5px, transparent 1.6px),
-        radial-gradient(var(--dot-sage) 2.25px, transparent 2.35px);
-      background-position: 0 0, 6px 6px;
-      background-size: 12px 12px;
-    }
-    .side-dot-band.left {
-      left: 0;
-      -webkit-mask-image:
-        linear-gradient(to right, rgba(0, 0, 0, 0.92) 0%, rgba(0, 0, 0, 0.35) 100%),
-        linear-gradient(to bottom, rgba(0, 0, 0, 0.95) 0%, rgba(0, 0, 0, 0.78) 58%, rgba(0, 0, 0, 0.15) 100%);
-      -webkit-mask-composite: source-in;
-      mask-image:
-        linear-gradient(to right, rgba(0, 0, 0, 0.92) 0%, rgba(0, 0, 0, 0.35) 100%),
-        linear-gradient(to bottom, rgba(0, 0, 0, 0.95) 0%, rgba(0, 0, 0, 0.78) 58%, rgba(0, 0, 0, 0.15) 100%);
-      mask-composite: intersect;
-    }
-    .side-dot-band.right {
-      right: 0;
-      -webkit-mask-image:
-        linear-gradient(to left, rgba(0, 0, 0, 0.92) 0%, rgba(0, 0, 0, 0.35) 100%),
-        linear-gradient(to bottom, rgba(0, 0, 0, 0.95) 0%, rgba(0, 0, 0, 0.78) 58%, rgba(0, 0, 0, 0.15) 100%);
-      -webkit-mask-composite: source-in;
-      mask-image:
-        linear-gradient(to left, rgba(0, 0, 0, 0.92) 0%, rgba(0, 0, 0, 0.35) 100%),
-        linear-gradient(to bottom, rgba(0, 0, 0, 0.95) 0%, rgba(0, 0, 0, 0.78) 58%, rgba(0, 0, 0, 0.15) 100%);
-      mask-composite: intersect;
-    }
-    .sheet-body {
-      position: relative;
-      z-index: 2;
-      flex: 1;
-      padding: 24px 36px 18px;
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-    }
-    .top-header {
-      position: relative;
-      z-index: 2;
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      gap: 18px;
-    }
-    .photo-box {
-      position: relative;
-      z-index: 3;
-      width: 96px;
-      height: 118px;
-      background-color: var(--bg-sheet);
-      border: 1px solid var(--line-soft);
-      flex-shrink: 0;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      overflow: hidden;
-      text-align: center;
-      color: #6f7c75;
-      font-size: 10.5px;
-      line-height: 1.35;
-    }
-    .photo-box:hover { border-color: var(--green-mid); }
-    .photo-box input { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
-    .photo-box img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: none; }
-    .photo-box.has-photo img { display: block; }
-    .photo-box.has-photo .photo-hint { display: none; }
-    @media print { .photo-hint, .photo-box input { display: none; } }
-    .center-rules {
-      position: relative;
-      z-index: 3;
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 10px;
-      padding-top: 8px;
-    }
-    .certificate-title-block {
-      width: 100%;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 4px;
-      padding: 4px 0 6px;
-      text-align: center;
-    }
-    .cert-title-ar {
-      font-family: 'Cairo', 'Inter', system-ui, sans-serif;
-      font-size: 23px;
-      font-weight: 700;
-      line-height: 1.25;
-      color: var(--green-mid);
-      direction: rtl;
-    }
-    .cert-title-en {
-      font-family: 'Inter', system-ui, sans-serif;
-      font-size: 16px;
-      font-weight: 700;
-      line-height: 1.25;
-      color: #555c58;
-      letter-spacing: 0.01em;
-    }
-    .emblem-mark {
-      position: relative;
-      z-index: 3;
-      width: 62px;
-      height: 76px;
-      border: none;
-      box-shadow: none;
-      background-color: transparent;
-      flex-shrink: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .emblem-mark svg { width: 100%; height: 100%; display: block; border: none; box-shadow: none; }
-    .bilingual-fields {
-      position: relative;
-      z-index: 3;
-      display: flex;
-      flex-direction: column;
-      background-color: var(--bg-sheet);
-      border-top: 1px solid var(--line-soft);
-      border-bottom: 1px solid var(--line-soft);
-    }
-    .field-pair { display: flex; flex-direction: column; background-color: var(--bg-sheet); }
-    .bilingual-header-bar {
-      width: 100%;
-      height: 29px;
-      padding: 0 12px;
-      display: flex;
-      align-items: center;
-      background: linear-gradient(90deg, var(--green-mid) 0%, var(--green-bright) 55%, var(--green-deep) 100%);
-      border-bottom: 1px solid rgba(255, 255, 255, 0.22);
-    }
-    .bilingual-header-bar.is-en { justify-content: flex-start; }
-    .bilingual-header-bar.is-ar { justify-content: flex-end; }
-    .label-en { color: #ffffff; font-family: 'Inter', system-ui, sans-serif; font-size: 13px; font-weight: 600; line-height: 1.15; letter-spacing: 0.005em; text-align: left; }
-    .label-ar { color: #ffffff; font-family: 'Cairo', 'Inter', system-ui, sans-serif; font-size: 13.5px; font-weight: 600; line-height: 1.15; text-align: right; direction: rtl; }
-    .blank-value-strip {
-      width: 100%;
-      min-height: 28px;
-      padding: 2px 10px;
-      background-color: #ffffff;
-      border-bottom: 1px solid var(--line-faint);
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .blank-value-strip.is-ar-row { justify-content: flex-start; }
-    .blank-value-strip.is-en-row { justify-content: flex-end; }
-    .detail-input-box {
-      width: 100%;
-      height: 22px;
-      padding: 0 8px;
-      background-color: #ffffff;
-      border: 1px solid #d9e0dc;
-      border-radius: 3px;
-      font-family: inherit;
-      font-size: 12px;
-      font-weight: 500;
-      color: #242e28;
-      outline: none;
-      transition: border-color 0.15s ease, box-shadow 0.15s ease;
-    }
-    .detail-input-box:focus { border-color: var(--green-mid); box-shadow: 0 0 0 2px rgba(40, 133, 80, 0.12); }
-    .detail-input-box.is-ar-input { font-family: 'Cairo', 'Inter', system-ui, sans-serif; text-align: left; direction: rtl; }
-    .detail-input-box.is-en-input { text-align: right; direction: ltr; }
-    .field-side-note { font-size: 11px; color: #6c7771; white-space: nowrap; flex-shrink: 0; }
-    .field-pair:last-child .blank-value-strip { border-bottom: none; }
-    .bottom-meta {
-      position: relative;
-      z-index: 3;
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 24px;
-      margin-top: auto;
-      padding-top: 6px;
-      align-items: start;
-    }
-    .meta-slot { width: 100%; min-height: 36px; padding: 2px 0; }
-    .cert-statement-en { font-family: 'Inter', system-ui, sans-serif; font-size: 10.5px; line-height: 1.38; color: #4f5752; text-align: left; }
-    .cert-statement-ar { font-family: 'Cairo', 'Inter', system-ui, sans-serif; font-size: 11px; line-height: 1.42; color: #248a52; font-weight: 600; text-align: right; direction: rtl; }
-    .bottom-accent-bar {
-      position: relative;
-      z-index: 4;
-      width: 100%;
-      min-height: 28px;
-      padding: 5px 24px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      background: linear-gradient(90deg, var(--green-deep) 0%, var(--green-mid) 28%, var(--green-bright) 50%, var(--green-mid) 72%, var(--green-deep) 100%);
-      color: #ffffff;
-      font-size: 11px;
-      font-weight: 500;
-    }
-    .footer-item { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
-    .footer-item svg { width: 13px; height: 13px; flex-shrink: 0; fill: currentColor; }
-    @media (max-width: 640px) {
-      .page-wrapper { padding: 0; }
-      .sheet { border-radius: 0; min-height: auto; height: auto; }
-      .side-dot-band { width: 34px; background-size: 10px 10px; }
-      .sheet-body { padding: 16px 12px 14px; gap: 12px; }
-      .photo-box { width: 68px; height: 84px; }
-      .emblem-mark { width: 46px; height: 58px; }
-      .cert-title-ar { font-size: 18px; }
-      .cert-title-en { font-size: 13px; }
-      .bilingual-header-bar { height: 26px; padding: 0 9px; }
-      .label-en { font-size: 11px; }
-      .label-ar { font-size: 11.5px; }
-      .blank-value-strip { min-height: 26px; padding: 2px 8px; }
-      .detail-input-box { height: 20px; font-size: 11px; padding: 0 6px; }
-      .bottom-meta { gap: 12px; }
-      .bottom-accent-bar { padding: 4px 10px; gap: 6px; font-size: 9.5px; }
-      .cert-statement-en { font-size: 9.5px; }
-      .cert-statement-ar { font-size: 10px; }
-      .field-side-note { font-size: 10px; }
-    }
-  </style>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TextFix AI - Kisi bhi image ka text 10 second me badlo</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+<style>body{font-family:'Inter',sans-serif} .orange{background:#FF6B00} input,select{outline:none} #drop{border:2px dashed #FF6B00}</style>
 </head>
-(function setupPhotoUpload() {
-  try {
-    const input = document.getElementById('photoInput');
-    const img = document.getElementById('photoPreview');
-    const box = document.getElementById('photoBox');
-    if (!input || !img || !box) return;
+<body class="bg-white text-black">
 
-    input.addEventListener('change', () => {
-      const file = input.files && input.files[0];
-      if (!file || !file.type.startsWith('image/')) return;
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        if (typeof event.target?.result === 'string') {
-          img.src = event.target.result;
-          box.classList.add('has-photo');
-        }
-      };
-      reader.readAsDataURL(file);
-    });
-  } catch (err) {
-    // Resilient fallback without popups
-  }
-})();
+<!-- NAVBAR -->
+<nav class="flex justify-between items-center px-4 md:px-10 py-4 shadow sticky top-0 bg-white z-50">
+<div class="font-extrabold text-xl">🟧 TextFix <span class="text-[#FF6B00]">AI</span></div>
+<div class="hidden md:flex gap-6 text-sm font-medium"><a href="#editor">Editor</a><a href="#features">Features</a><a href="#pricing">Pricing</a><a href="#faq">FAQ</a></div>
+<div class="flex items-center gap-2"><span class="bg-orange-100 text-[#FF6B00] px-3 py-1 rounded-full text-xs font-bold">Credits: <span id="creditCount">1</span></span><button class="bg-black text-white px-4 py-2 rounded-full text-sm">Login</button></div>
+</nav>
 
-(function renderBilingualFields() {
-  try {
-    const container = document.getElementById('bilingualFields');
-    if (!container) return;
+<!-- HERO -->
+<header class="text-center px-4 py-10 md:py-16 bg-gradient-to-b from-orange-50 to-white">
+<span class="bg-[#FF6B00] text-white text-xs px-3 py-1 rounded-full font-bold">🔥 1 FREE EDIT</span>
+<h1 class="text-3xl md:text-5xl font-extrabold mt-4 leading-tight">Kisi bhi image ka text<br><span class="text-[#FF6B00]">10 second me badlo</span></h1>
+<p class="text-gray-600 mt-3">Poster, Thumbnail, Banner, Shop Board - font, color, background same rahega.</p>
+<a href="#editor" class="inline-block mt-6 bg-[#FF6B00] text-white px-8 py-3 rounded-full font-bold shadow-lg">📸 Image Upload Karo - FREE</a>
+</header>
 
-    const rowDefinitions = [
-      { lang: 'ar', text: 'رقم الشهادة' },
-      { lang: 'en', text: 'Certification No.' },
-      { lang: 'ar', text: 'تاريخ إصدار الشهادة' },
-      { lang: 'en', text: 'Date of Issue' },
-      { lang: 'ar', text: 'تاريخ إنتهاء الشهادة' },
-      { lang: 'en', text: 'Date of Expiry' },
-      { lang: 'ar', text: 'الاسم' },
-      { lang: 'en', text: 'Name' },
-      { lang: 'ar', text: 'رقم الهوية' },
-      { lang: 'en', text: 'ID No.' },
-      { lang: 'ar', text: 'رقم الجواز' },
-      { lang: 'en', text: 'Passport number' },
-      { lang: 'ar', text: 'تاريخ الميلاد' },
-      { lang: 'en', text: 'Date of Birth' },
-      { lang: 'ar', text: 'الجنسية' },
-      { lang: 'en', text: 'Nationality' },
-      { lang: 'ar', text: 'الجهة الطالبة' },
-      { lang: 'en', text: 'Requested By' },
-      { lang: 'ar', text: 'الغرض من الطلب' },
-      { lang: 'en', text: 'Certification Purpose' }
-    ];
+<!-- EDITOR -->
+<section id="editor" class="max-w-3xl mx-auto px-4 pb-10">
+<div class="bg-gray-50 p-4 rounded-2xl shadow">
+<label class="text-sm font-bold">🔑 Apni Gemini API Key:</label>
+<input id="apiKey" type="password" placeholder="AIza... paste karo" class="w-full mt-1 p-3 rounded-xl border bg-white" oninput="localStorage.setItem('tf_key',this.value)">
+<p class="text-[11px] text-gray-500 mt-1">Key sirf tumhare browser me rehti hai, GitHub pe save nahi hoti.</p>
+</div>
 
-    const fragment = document.createDocumentFragment();
+<div id="drop" class="mt-4 p-6 rounded-2xl text-center bg-white cursor-pointer" onclick="document.getElementById('file').click()">
+<input type="file" id="file" accept="image/*" hidden>
+<p class="text-2xl">📁</p><p class="font-bold">Image yahan drop karo ya click karo</p><p class="text-xs text-gray-500">PNG, JPG, WEBP - Max 10MB</p>
+<img id="preview" class="hidden mx-auto mt-4 rounded-xl max-h-64">
+</div>
 
-    rowDefinitions.forEach((row) => {
-      const pairEl = document.createElement('div');
-      pairEl.className = 'field-pair';
+<div class="grid md:grid-cols-2 gap-3 mt-4">
+<input id="oldText" placeholder="Original Text - jo likha hai" class="p-3 border rounded-xl">
+<input id="newText" placeholder="Replacement Text - kya likhna hai" class="p-3 border rounded-xl">
+</div>
+<div class="grid grid-cols-2 gap-3 mt-3">
+<select id="lang" class="p-3 border rounded-xl"><option>Urdu</option><option>English</option><option>Hindi</option></select>
+<select id="quality" class="p-3 border rounded-xl"><option>Fast 2K</option><option>Pro 4K</option></select>
+</div>
 
-      const headerBarEl = document.createElement('div');
-      headerBarEl.className = `bilingual-header-bar ${row.lang === 'ar' ? 'is-ar' : 'is-en'}`;
+<button onclick="generate()" id="genBtn" class="w-full mt-4 bg-[#FF6B00] text-white py-4 rounded-xl font-extrabold text-lg">✨ GENERATE - Text Badlo</button>
+<p id="status" class="text-center text-sm mt-3 font-medium text-[#FF6B00]"></p>
 
-      const labelSpan = document.createElement('span');
-      if (row.lang === 'ar') {
-        labelSpan.className = 'label-ar';
-        labelSpan.setAttribute('dir', 'rtl');
-      } else {
-        labelSpan.className = 'label-en';
-        labelSpan.setAttribute('dir', 'ltr');
-      }
-      labelSpan.textContent = row.text;
+<div id="resultBox" class="hidden mt-4">
+<p class="font-bold mb-2">Result:</p>
+<img id="resultImg" class="w-full rounded-xl shadow">
+<div class="flex gap-2 mt-3"><a id="dl" download="textfix-ai.png" class="flex-1 text-center bg-black text-white py-3 rounded-xl font-bold">⬇️ HD Download</a><button onclick="location.reload()" class="flex-1 bg-gray-200 py-3 rounded-xl font-bold">New Edit</button></div>
+</div>
+</div>
 
-      const blankStripEl = document.createElement('div');
-      blankStripEl.className = `blank-value-strip ${row.lang === 'ar' ? 'is-ar-row' : 'is-en-row'}`;
+<div class="mt-4"><p class="font-bold text-sm">Recent Edits:</p><div id="history" class="flex gap-2 overflow-x-auto mt-2"></div></div>
+</section>
 
-      const detailBox = document.createElement('input');
-      detailBox.type = 'text';
-      detailBox.className = `detail-input-box ${row.lang === 'ar' ? 'is-ar-input' : 'is-en-input'}`;
-      detailBox.setAttribute('aria-label', row.text);
-      detailBox.setAttribute('dir', row.lang === 'ar' ? 'rtl' : 'ltr');
+<!-- HOW -->
+<section class="max-w-4xl mx-auto px-4 py-8 grid md:grid-cols-3 gap-4 text-center">
+<div class="p-5 bg-orange-50 rounded-2xl"><div class="text-3xl">📤</div><h3 class="font-bold mt-2">1. Upload</h3><p class="text-sm text-gray-600">Image upload karo</p></div>
+<div class="p-5 bg-orange-50 rounded-2xl"><div class="text-3xl">✍️</div><h3 class="font-bold mt-2">2. Text Likho</h3><p class="text-sm text-gray-600">Purana aur naya text likho</p></div>
+<div class="p-5 bg-orange-50 rounded-2xl"><div class="text-3xl">⬇️</div><h3 class="font-bold mt-2">3. Download</h3><p class="text-sm text-gray-600">HD me download karo</p></div>
+</section>
 
-      const sideNote = document.createElement('span');
-      sideNote.className = 'field-side-note';
-      sideNote.textContent = row.lang === 'ar' ? '←' : '→';
+<!-- FEATURES -->
+<section id="features" class="max-w-4xl mx-auto px-4 py-6">
+<h2 class="text-2xl font-extrabold text-center">Features</h2>
+<div class="grid grid-cols-2 md:grid-cols-3 gap-3 mt-4">
+<div class="p-4 border rounded-2xl">🎨 <b>Font Match</b><p class="text-xs text-gray-600">Wahi font, wahi style</p></div>
+<div class="p-4 border rounded-2xl">🌈 <b>Color Match</b><p class="text-xs text-gray-600">Wahi color, wahi shadow</p></div>
+<div class="p-4 border rounded-2xl">🖼️ <b>Background Preserve</b><p class="text-xs text-gray-600">Background same rahega</p></div>
+<div class="p-4 border rounded-2xl">🌍 <b>Translation</b><p class="text-xs text-gray-600">Urdu / English / Hindi</p></div>
+<div class="p-4 border rounded-2xl">🧹 <b>Text Erase</b><p class="text-xs text-gray-600">Text saaf karo</p></div>
+<div class="p-4 border rounded-2xl">✨ <b>Gibberish Fix</b><p class="text-xs text-gray-600">Kharab text theek karo</p></div>
+</div>
+</section>
 
-      if (row.lang === 'ar') {
-        blankStripEl.appendChild(detailBox);
-        blankStripEl.appendChild(sideNote);
-      } else {
-        blankStripEl.appendChild(sideNote);
-        blankStripEl.appendChild(detailBox);
-      }
+<!-- PRICING -->
+<section id="pricing" class="max-w-4xl mx-auto px-4 py-8">
+<h2 class="text-2xl font-extrabold text-center">Pricing</h2>
+<div class="grid md:grid-cols-3 gap-4 mt-5">
+<div class="p-5 border rounded-2xl text-center"><h3 class="font-bold">Free</h3><p class="text-3xl font-extrabold mt-2">$0</p><p class="text-sm">1 Credit</p><button class="w-full mt-3 bg-gray-200 py-2 rounded-xl font-bold">Start Free</button></div>
+<div class="p-5 border-2 border-[#FF6B00] rounded-2xl text-center bg-orange-50"><h3 class="font-bold">30 Credits ⭐ Popular</h3><p class="text-3xl font-extrabold mt-2">$9.90</p><p class="text-sm">HD Download</p><button onclick="alert('JazzCash / Easypaisa se contact karo')" class="w-full mt-3 bg-[#FF6B00] text-white py-2 rounded-xl font-bold">Buy Now</button></div>
+<div class="p-5 border rounded-2xl text-center"><h3 class="font-bold">100 Credits</h3><p class="text-3xl font-extrabold mt-2">$24.90</p><p class="text-sm">Best for Shops</p><button onclick="alert('JazzCash / Easypaisa se contact karo')" class="w-full mt-3 bg-black text-white py-2 rounded-xl font-bold">Buy Now</button></div>
+</div>
+</section>
 
-      headerBarEl.appendChild(labelSpan);
-      pairEl.appendChild(headerBarEl);
-      pairEl.appendChild(blankStripEl);
-      fragment.appendChild(pairEl);
-    });
+<!-- FAQ -->
+<section id="faq" class="max-w-3xl mx-auto px-4 pb-10">
+<h2 class="text-2xl font-extrabold text-center">FAQ</h2>
+<details class="border p-3 rounded-xl mt-3"><summary class="font-bold cursor-pointer">Kya ye free hai?</summary><p class="text-sm mt-2">Pehla edit free hai, uske baad apni API key se unlimited.</p></details>
+<details class="border p-3 rounded-xl mt-2"><summary class="font-bold cursor-pointer">ID Card ka text badal sakte hain?</summary><p class="text-sm mt-2">Nahi, ID, Passport, Bank documents block hain. Sirf poster / banner / shop board ke liye hai.</p></details>
+<details class="border p-3 rounded-xl mt-2"><summary class="font-bold cursor-pointer">Meri API key safe hai?</summary><p class="text-sm mt-2">Haan, key sirf tumhare browser me rehti hai.</p></details>
+<details class="border p-3 rounded-xl mt-2"><summary class="font-bold cursor-pointer">Quality kaisi hogi?</summary><p class="text-sm mt-2">Font aur background same rehta hai, HD download milta hai.</p></details>
+<details class="border p-3 rounded-xl mt-2"><summary class="font-bold cursor-pointer">Payment kaise karen?</summary><p class="text-sm mt-2">JazzCash / Easypaisa se contact karo.</p></details>
+</section>
 
-    container.appendChild(fragment);
-  } catch (err) {
-    // Resilient fallback without popups
-  }
-})();
-  <script>
-    // Paste Part 3 script here
-  </script>
+<footer class="bg-black text-white text-center py-6 text-sm">© 2026 TextFix AI - Made in Pakistan 🇵🇰 | Privacy | Terms | Contact</footer>
+
+<script>
+let base64="", credits=1;
+document.getElementById('apiKey').value=localStorage.getItem('tf_key')||'';
+document.getElementById('file').addEventListener('change',e=>{
+let f=e.target.files[0]; if(!f) return;
+let r=new FileReader(); r.onload=()=>{base64=r.result.split(',')[1]; let p=document.getElementById('preview'); p.src=r.result; p.classList.remove('hidden');}; r.readAsDataURL(f);
+});
+async function generate(){
+let key=document.getElementById('apiKey').value.trim();
+let oldT=document.getElementById('oldText').value.trim();
+let newT=document.getElementById('newText').value.trim();
+if(!key){alert('Pehle API Key dalo');return;}
+if(!base64){alert('Pehle image upload karo');return;}
+if(!oldT||!newT){alert('Dono text likho');return;}
+if(credits<=0){alert('Credits khatam! Buy Credits karo');return;}
+let btn=document.getElementById('genBtn'); btn.innerText='⏳ AI Editing... Please wait...'; btn.disabled=true;
+document.getElementById('status').innerText='AI is editing your image...';
+try{
+let res=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image:generateContent?key=${key}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contents:[{parts:[{text:`Replace only the text '${oldT}' with '${newT}' in this image. Language: ${document.getElementById('lang').value}. Keep font, color, size, shadow, perspective, background and everything else exactly same. Do not change anything else. Do not process ID cards, passports, bank documents.`},{inline_data:{mime_type:'image/jpeg',data:base64}}]}]})});
+let data=await res.json();
+let part=data.candidates?.[0]?.content?.parts?.find(p=>p.inlineData);
+if(!part){throw new Error(data.error?.message||'AI ne image nahi banai. Dobara try karo.')}
+let img='data:image/png;base64,'+part.inlineData.data;
+document.getElementById('resultImg').src=img; document.getElementById('dl').href=img;
+document.getElementById('resultBox').classList.remove('hidden');
+credits--; document.getElementById('creditCount').innerText=credits;
+document.getElementById('status').innerText='✅ Ho gaya! Download karo.';
+let h=document.createElement('img'); h.src=img; h.className='w-20 h-20 object-cover rounded-xl'; document.getElementById('history').appendChild(h);
+}catch(e){document.getElementById('status').innerText='❌ Error: '+e.message;}
+btn.innerText='✨ GENERATE - Text Badlo'; btn.disabled=false;
+}
+</script>
 </body>
 </html>
